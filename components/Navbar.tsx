@@ -2,9 +2,12 @@ import { NavLinks } from "@/constants";
 import Image from "next/image";
 import Link from "next/link";
 import AuthProviders from "./AuthProviders";
+import { getCurrentUser } from "@/lib/session";
 
-const Navbar = () => {
-    const session = {};
+//Making Navbar an async function so that we can use await within
+const Navbar = async () => {
+  const session = await getCurrentUser();
+  
   return (
     <nav className="flexBetween navbar">
       <div className="flex-1 flexStart gap-10">
@@ -22,17 +25,23 @@ const Navbar = () => {
       </div>
 
       <div className="flexCenter gap-4">
-            {session ? (
-                <>
-                UserPhoto
-
-                <Link href="/create-projects">
-                    Share Work
-                </Link>
-                </>
-            ) : (
-                <AuthProviders />
+        {session?.user ? (
+          <>
+          {/* The Image will only rendered when it is available */}
+            {session?.user?.image && (
+            <Image
+              src={session.user.image}
+              width={40}
+              height={40}
+              className="rounded-full"
+              alt={session.user.name}
+            />
             )}
+            <Link href="/create-projects">Share Work</Link>
+          </>
+        ) : (
+          <AuthProviders />
+        )}
       </div>
     </nav>
   );
